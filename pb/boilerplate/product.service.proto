@@ -1,0 +1,12 @@
+syntax = "proto3";
+package pb.boilerplate;
+
+option go_package = "pb/boilerplate";
+
+import "pb/boilerplate/product.proto";
+
+service ProductService {
+    // product
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {}
+    rpc FindByID(FindByIDRequest) returns (Product) {}
+}
