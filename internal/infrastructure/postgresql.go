@@ -1,12 +1,13 @@
 package infrastructure
 
 import (
+	"context"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 	gormLogger "gorm.io/gorm/logger"
 
-	"github.com/bagastri07/boilerplate-service/internal/config"
+	"github.com/bagastri07/authorization-service/internal/config"
 	"github.com/jpillora/backoff"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -30,6 +31,8 @@ func InitializePostgresConn() {
 	StopTickerCh = make(chan bool)
 
 	go checkConnection(time.NewTicker(config.DatabasePingInterval()))
+
+	PostgreSQL.Logger = newCustomLogger()
 
 	switch config.LogLevel() {
 	case "error":
@@ -103,4 +106,30 @@ func openPostgresConn(dsn string) (*gorm.DB, error) {
 	conn.SetConnMaxLifetime(config.DatabaseConnMaxLifetime())
 
 	return db, nil
+}
+
+type CustomLogger struct {
+	gormLogger.Interface
+}
+
+func (c CustomLogger) Error(ctx context.Context, msg string, v ...interface{}) {
+	if len(v) == 1 {
+		if err, ok := v[0].(error); ok {
+			if err == gorm.ErrRecordNotFound {
+				// log a warning for "record not found" errors
+				c.Interface.Warn(ctx, msg, v...)
+				return
+			}
+		}
+	}
+	// log an error for other errors
+	c.Interface.Error(ctx, msg, v...)
+}
+
+func (c CustomLogger) LogMode(level gormLogger.LogLevel) gormLogger.Interface {
+	return CustomLogger{c.Interface.LogMode(level)}
+}
+
+func newCustomLogger() CustomLogger {
+	return CustomLogger{gormLogger.Default.LogMode(gormLogger.Info)}
 }

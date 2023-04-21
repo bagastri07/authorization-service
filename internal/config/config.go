@@ -164,3 +164,18 @@ func RedisCacheTTL() time.Duration {
 	cfg := viper.GetString("cache_ttl")
 	return parseDuration(cfg, DefaultRedisCacheTTL)
 }
+
+func JwtAccessTokenSecret() []byte {
+	return []byte(viper.GetString("jwt.access_token_secret"))
+}
+
+func JwtRefreshTokenSecret() []byte {
+	return []byte(viper.GetString("jwt.refresh-token-secret"))
+}
+
+func CryptoCost() int {
+	if !viper.IsSet("crypto.cost") {
+		return DefaultCryptoCost
+	}
+	return viper.GetInt("cyrpto.cost")
+}

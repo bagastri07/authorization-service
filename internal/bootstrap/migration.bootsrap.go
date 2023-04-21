@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/lib/pq" // postgres driver
 
-	"github.com/bagastri07/boilerplate-service/internal/config"
+	"github.com/bagastri07/authorization-service/internal/config"
 	"github.com/pressly/goose/v3"
 )
 

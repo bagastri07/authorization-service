@@ -2,6 +2,10 @@ package customerror
 
 import "errors"
 
+const (
+	GORMDuplicatedKeyNotAllowed = "duplicated key not allowed"
+)
+
 var (
-	ErrorProductNotFound = errors.New("product not found")
+	ErrorEmailAlreadyExist = errors.New("email already registered")
 )

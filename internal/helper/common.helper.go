@@ -1,6 +1,8 @@
 package helper
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 // WrapCloser call close and log the error
 func WrapCloser(close func() error) {
