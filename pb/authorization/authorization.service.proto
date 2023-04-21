@@ -1,0 +1,20 @@
+syntax = "proto3";
+package pb.authorization;
+
+option go_package = "pb/authorization";
+
+import "pb/authorization/authorization.proto";
+import "pb/authorization/user.proto";
+import "google/protobuf/wrappers.proto";
+
+service ProductService {
+    // auth
+    rpc GetUserInfoByID(GetUserInfoRequest) returns (User) {}
+    rpc HasAccess(HasAccessRequest) returns (google.protobuf.BoolValue) {}
+    rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse) {}
+
+    // user
+	rpc Login(LoginRequest) returns (AuthResponse) {}
+	rpc Register(RegisterRequest) returns (AuthResponse) {}
+	rpc Logout(LogoutRequest) returns (google.protobuf.BoolValue) {}
+}

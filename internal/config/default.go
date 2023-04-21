@@ -18,4 +18,6 @@ const (
 	DefaultRedisWriteTimeout = 2 * time.Second
 	DefaultRedisReadTimeout  = 2 * time.Second
 	DefaultRedisCacheTTL     = 15 * time.Minute
+
+	DefaultCryptoCost = 14
 )

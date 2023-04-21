@@ -1,7 +1,7 @@
 package console
 
 import (
-	"github.com/bagastri07/boilerplate-service/internal/bootstrap"
+	"github.com/bagastri07/authorization-service/internal/bootstrap"
 	"github.com/spf13/cobra"
 )
 

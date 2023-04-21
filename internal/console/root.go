@@ -3,7 +3,7 @@ package console
 import (
 	"os"
 
-	"github.com/bagastri07/boilerplate-service/internal/config"
+	"github.com/bagastri07/authorization-service/internal/config"
 	runtime "github.com/banzaicloud/logrus-runtime-formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

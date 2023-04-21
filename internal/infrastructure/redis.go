@@ -1,7 +1,7 @@
 package infrastructure
 
 import (
-	"github.com/bagastri07/boilerplate-service/internal/config"
+	"github.com/bagastri07/authorization-service/internal/config"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )

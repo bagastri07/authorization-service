@@ -1,10 +1,10 @@
 SHELL:=/bin/bash
 
-SERVICE_NAME=boilerplate-service
+SERVICE_NAME=authorization-service
 VERSION?= $(shell git describe --match 'v[0-9]*' --tags --always)
 PACKAGE_NAME=github.com/bagastri07/${SERVICE_NAME}
 
-build_loc=./bin/boilerplate-service
+build_loc=./bin/authorization-service
 build_args=-ldflags "-s -w -X $(PACKAGE_NAME)/internal/config.serviceVersion=$(VERSION) -X $(PACKAGE_NAME)/internal/config.serviceName=$(SERVICE_NAME)" -o ${build_loc} ./main.go
 changelog_args=-o CHANGELOG.md -tag-filter-pattern '^v'
 
@@ -51,8 +51,8 @@ mock: ; $(info $(M) generating mock...) @
 .PHONY: proto
 proto:
 	@protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. \
-  		--go-grpc_opt=paths=source_relative pb/boilerplate/*.proto
-	@ls pb/boilerplate/*.pb.go | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,}'
+  		--go-grpc_opt=paths=source_relative pb/authorization/*.proto
+	@ls pb/authorization/*.pb.go | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,}'
 
 .PHONY: coverage
 coverage:

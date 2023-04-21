@@ -6,18 +6,17 @@ import (
 	"net"
 	"net/http"
 
-	grpcTransport "github.com/bagastri07/boilerplate-service/internal/delivery/grpc"
-	pb "github.com/bagastri07/boilerplate-service/pb/boilerplate"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-
-	"github.com/bagastri07/boilerplate-service/internal/config"
-	"github.com/bagastri07/boilerplate-service/internal/constant"
-	"github.com/bagastri07/boilerplate-service/internal/infrastructure"
-	"github.com/bagastri07/boilerplate-service/internal/repository"
-	"github.com/bagastri07/boilerplate-service/internal/usecase"
+	"github.com/bagastri07/authorization-service/internal/config"
+	"github.com/bagastri07/authorization-service/internal/constant"
+	grpcDelivery "github.com/bagastri07/authorization-service/internal/delivery/grpc"
+	"github.com/bagastri07/authorization-service/internal/infrastructure"
+	"github.com/bagastri07/authorization-service/internal/repository"
+	"github.com/bagastri07/authorization-service/internal/usecase"
+	pb "github.com/bagastri07/authorization-service/pb/authorization"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func StartServer() {
@@ -27,29 +26,29 @@ func StartServer() {
 	pgDB, err := infrastructure.PostgreSQL.DB()
 	continueOrFatal(err)
 
-	// init repositories
-	productRepository := repository.NewProductRepository(infrastructure.PostgreSQL, infrastructure.RedisClient)
+	// // init repositories
+	userRepository := repository.NewUserRepository(infrastructure.PostgreSQL, infrastructure.RedisClient)
 
-	// init usecases
-	productUsecase := usecase.NewProductUsecase(productRepository)
+	// // init usecases
+	userUsecase := usecase.NewUserUsecase(userRepository)
+	fmt.Println(userUsecase)
 
 	// init grpc
-	grpcDelivery := grpcTransport.NewGRPCServer()
-	err = grpcDelivery.InjectProductUsecase(productUsecase)
-	continueOrFatal(err)
+	grpcDelivery := grpcDelivery.NewGRPCServer()
+	grpcDelivery.InjectUserUsecase(userUsecase)
 
-	productGRPCServer := grpc.NewServer()
+	authorizationGRPCServer := grpc.NewServer()
 
-	pb.RegisterProductServiceServer(productGRPCServer, grpcDelivery)
+	pb.RegisterProductServiceServer(authorizationGRPCServer, grpcDelivery)
 	if config.Env() == constant.EnvDevelopment {
-		reflection.Register(productGRPCServer)
+		reflection.Register(authorizationGRPCServer)
 	}
 
 	lis, err := net.Listen("tcp", ":"+config.GRPCPort())
 	continueOrFatal(err)
 
 	go func() {
-		err = productGRPCServer.Serve(lis)
+		err = authorizationGRPCServer.Serve(lis)
 		continueOrFatal(err)
 	}()
 
