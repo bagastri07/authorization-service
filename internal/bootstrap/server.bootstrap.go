@@ -28,10 +28,12 @@ func StartServer() {
 
 	// // init repositories
 	userRepository := repository.NewUserRepository(infrastructure.PostgreSQL, infrastructure.RedisClient)
+	userRoleRepository := repository.NewUserRepoRepository(infrastructure.PostgreSQL)
 
 	// // init usecases
-	userUsecase := usecase.NewUserUsecase(userRepository)
-	fmt.Println(userUsecase)
+	userUsecase := usecase.NewUserUsecase()
+	userUsecase.InjectUserRepository(userRepository)
+	userUsecase.InjectUserRoleRepository(userRoleRepository)
 
 	// init grpc
 	grpcDelivery := grpcDelivery.NewGRPCServer()

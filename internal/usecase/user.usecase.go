@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bagastri07/authorization-service/internal/constant"
 	cErr "github.com/bagastri07/authorization-service/internal/constant/customerror"
 	"github.com/bagastri07/authorization-service/internal/helper"
 	"github.com/bagastri07/authorization-service/internal/infrastructure"
@@ -16,12 +17,11 @@ import (
 
 type userUsecase struct {
 	userRepo model.UserRepository
+	userRole model.UserRoleRepository
 }
 
-func NewUserUsecase(userRepo model.UserRepository) model.UserUsecase {
-	return &userUsecase{
-		userRepo: userRepo,
-	}
+func NewUserUsecase() model.UserUsecase {
+	return &userUsecase{}
 }
 
 func (uc *userUsecase) Register(ctx context.Context, user *model.User) (*model.TokenResp, error) {
@@ -75,6 +75,19 @@ func (uc *userUsecase) create(ctx context.Context, user *model.User) (*uuid.UUID
 		logrus.WithFields(logrus.Fields{
 			"ctx":  helper.DumpIncomingContext(ctx),
 			"user": helper.Dump(user),
+		}).Error(err)
+		return nil, err
+	}
+
+	err = uc.userRole.Create(ctx, &model.UserRole{
+		RoleID: uuid.UUID(constant.CustomerRoleID),
+		UserID: *userID,
+	})
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ctx":    helper.DumpIncomingContext(ctx),
+			"userID": helper.Dump(userID),
 		}).Error(err)
 		return nil, err
 	}

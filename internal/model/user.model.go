@@ -28,4 +28,7 @@ type UserRepository interface {
 
 type UserUsecase interface {
 	Register(ctx context.Context, user *User) (*TokenResp, error)
+
+	InjectUserRepository(userRepo UserRepository)
+	InjectUserRoleRepository(userRoleRepo UserRoleRepository)
 }
