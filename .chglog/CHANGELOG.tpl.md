@@ -1,4 +1,4 @@
-# Boilerplate Service
+# Authorization Service
 
 {{ if .Versions -}}
 

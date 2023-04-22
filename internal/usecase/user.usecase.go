@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bagastri07/authorization-service/internal/constant"
 	cErr "github.com/bagastri07/authorization-service/internal/constant/customerror"
 	"github.com/bagastri07/authorization-service/internal/helper"
 	"github.com/bagastri07/authorization-service/internal/infrastructure"
@@ -15,16 +16,16 @@ import (
 )
 
 type userUsecase struct {
-	userRepo model.UserRepository
+	userRepo     model.UserRepository
+	userRoleRepo model.UserRoleRepository
+	tokenRepo    model.TokenRepository
 }
 
-func NewUserUsecase(userRepo model.UserRepository) model.UserUsecase {
-	return &userUsecase{
-		userRepo: userRepo,
-	}
+func NewUserUsecase() model.UserUsecase {
+	return &userUsecase{}
 }
 
-func (uc *userUsecase) Register(ctx context.Context, user *model.User) (*model.TokenResp, error) {
+func (uc *userUsecase) Register(ctx context.Context, user *model.User) (*model.Token, error) {
 	var err error
 	tx := infrastructure.PostgreSQL.Begin()
 
@@ -41,24 +42,42 @@ func (uc *userUsecase) Register(ctx context.Context, user *model.User) (*model.T
 
 	ctx = helper.NewTxContext(ctx, tx)
 
-	userID, err := uc.create(ctx, user)
+	userID, err := uc.createUser(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 
-	tokenResp, err := helper.GenerateJwtToken(userID.String())
+	token, err := uc.createAndCacheToken(ctx, *userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
+}
+
+func (uc *userUsecase) createAndCacheToken(ctx context.Context, userID uuid.UUID) (*model.Token, error) {
+	token, err := helper.GenerateJwtToken(userID.String())
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"ctx":    helper.DumpIncomingContext(ctx),
-			"userID": helper.Dump(user),
+			"userID": helper.Dump(userID),
 		}).Error(err)
 		return nil, err
 	}
 
-	return tokenResp, nil
+	err = uc.tokenRepo.Create(ctx, userID, token)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ctx":   helper.DumpIncomingContext(ctx),
+			"token": helper.Dump(token),
+		}).Error(err)
+		return nil, err
+	}
+
+	return token, nil
 }
 
-func (uc *userUsecase) create(ctx context.Context, user *model.User) (*uuid.UUID, error) {
+func (uc *userUsecase) createUser(ctx context.Context, user *model.User) (*uuid.UUID, error) {
 	err := uc.checkEmailAlreadyRegistered(ctx, user.Email)
 	if err != nil {
 		return nil, err
@@ -75,6 +94,19 @@ func (uc *userUsecase) create(ctx context.Context, user *model.User) (*uuid.UUID
 		logrus.WithFields(logrus.Fields{
 			"ctx":  helper.DumpIncomingContext(ctx),
 			"user": helper.Dump(user),
+		}).Error(err)
+		return nil, err
+	}
+
+	err = uc.userRoleRepo.Create(ctx, &model.UserRole{
+		RoleID: uuid.UUID(constant.CustomerRoleID),
+		UserID: *userID,
+	})
+
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"ctx":    helper.DumpIncomingContext(ctx),
+			"userID": helper.Dump(userID),
 		}).Error(err)
 		return nil, err
 	}
