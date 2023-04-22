@@ -2,7 +2,7 @@ style: github
 template: CHANGELOG.tpl.md
 info:
   title: CHANGELOG
-  repository_url: https://github.com/bagastri07/boilerplate-service
+  repository_url: https://github.com/bagastri07/authorization-service
 options:
   commits:
      filters:
