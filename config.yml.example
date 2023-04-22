@@ -25,5 +25,7 @@ redis:
 jwt:
   access_token_secret: "access-token-secret"
   refresh_token_secret: "refresh-token-secret"
+  access_token_duration: "10m"
+  refresh_token_duration: "2h"
 crypto:
   cost: 14

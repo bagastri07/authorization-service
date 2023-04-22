@@ -4,15 +4,14 @@ import (
 	"time"
 
 	"github.com/bagastri07/authorization-service/internal/config"
-	"github.com/bagastri07/authorization-service/internal/constant"
 	"github.com/bagastri07/authorization-service/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 )
 
-func GenerateJwtToken(ID string) (*model.TokenResp, error) {
+func GenerateJwtToken(ID string) (*model.Token, error) {
 
-	accessTokenExpiration := time.Now().Add(constant.JwtAccessTokenExpirationTime)
+	accessTokenExpiration := time.Now().Add(config.AccessTokenDuration())
 	claims := &model.Claims{
 		ID: ID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -28,6 +27,9 @@ func GenerateJwtToken(ID string) (*model.TokenResp, error) {
 		return nil, err
 	}
 
+	refreshTokenExpiration := time.Now().Add(config.RefreshTokenDuration())
+	claims.RegisteredClaims.ExpiresAt = jwt.NewNumericDate(refreshTokenExpiration)
+
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	refreshTokenStr, err := refreshToken.SignedString(config.JwtRefreshTokenSecret())
@@ -36,7 +38,7 @@ func GenerateJwtToken(ID string) (*model.TokenResp, error) {
 		return nil, err
 	}
 
-	return &model.TokenResp{
+	return &model.Token{
 		AccessToken:  accessTokenStr,
 		RefreshToken: refreshTokenStr,
 	}, nil

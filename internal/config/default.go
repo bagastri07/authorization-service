@@ -20,4 +20,7 @@ const (
 	DefaultRedisCacheTTL     = 15 * time.Minute
 
 	DefaultCryptoCost = 14
+
+	DefaultAccessTokenDuration  = 10 * time.Minute
+	DefaultRefreshTokenDuration = 6 * time.Hour
 )

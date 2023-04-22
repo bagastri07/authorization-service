@@ -179,3 +179,13 @@ func CryptoCost() int {
 	}
 	return viper.GetInt("cyrpto.cost")
 }
+
+func AccessTokenDuration() time.Duration {
+	cfg := viper.GetString("jwt.access_token_duration")
+	return parseDuration(cfg, DefaultAccessTokenDuration)
+}
+
+func RefreshTokenDuration() time.Duration {
+	cfg := viper.GetString("jwt.refresh_token_duration")
+	return parseDuration(cfg, DefaultRefreshTokenDuration)
+}

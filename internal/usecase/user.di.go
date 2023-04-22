@@ -7,5 +7,9 @@ func (uc *userUsecase) InjectUserRepository(userRepo model.UserRepository) {
 }
 
 func (uc *userUsecase) InjectUserRoleRepository(userRoleRepo model.UserRoleRepository) {
-	uc.userRole = userRoleRepo
+	uc.userRoleRepo = userRoleRepo
+}
+
+func (uc *userUsecase) InjectTokenRepository(tokenRepo model.TokenRepository) {
+	uc.tokenRepo = tokenRepo
 }
