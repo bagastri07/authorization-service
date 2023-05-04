@@ -13,8 +13,7 @@ jobs:
       uses: tsickert/discord-webhook@v5.3.0
       with:
         webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-        content: "> [** ${{ github.event.pull_request.title }} **](https://github.com/bagastri07/authorization-service/pull/${{ github.event.pull_request.number }})
->  Open By: ${{ github.event.pull_request.user.login }}"
+        content: "> [** ${{ github.event.pull_request.title }} **](https://github.com/bagastri07/authorization-service/pull/${{ github.event.pull_request.number }})\n>  Open By: ${{ github.event.pull_request.user.login }}"
 
     - name: Set up Go
       uses: actions/setup-go@v3
