@@ -5,9 +5,20 @@ on: [pull_request]
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
+
+    # - name: Notify Step Status
+    #   if: always()
+    #   uses: stegzilla/discord-notify@v2
+    #   with:
+    #     webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
+    #     title: "Step Status: ${{ job.status }}"
+    #     message: "${{ job.name }}: ${{ job.status }}"
+    #     include_image: false
+    #     avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+    #     username: Mantis Github Protector
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -22,18 +33,6 @@ jobs:
 
     - name: Unit Test
       run: go test $(go list ./... | grep -v /mocks/) --race -v -short -coverprofile=profile.cov
-
-    - name: Test Goverage Threshold
-      run: |
-        totalCoverage=`go tool cover -func profile.cov | grep total | grep -Eo '[0-9]+\.[0-9]+'`
-
-        if ! awk "BEGIN{ exit ($totalCoverage >= 0) }"
-        then
-            echo "Test Coverage: $totalCoverage% [PASSED]\n"
-        else
-            echo "Test Coverage: $totalCoverage% [BELOW THRESHOLD]\n"
-            exit 1
-        fi
 
     - name: Build
       run: go build -v ./...
